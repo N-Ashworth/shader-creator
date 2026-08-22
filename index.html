@@ -3,8 +3,26 @@
 <html>
   <head>
     <title>Shaderer</title>
+    <link rel="stylesheet" href="style.css"></link>
   </head>
   <body>
-    <p>Hello</p>
+    <header>
+      <div class="res-select">
+        <input type="number" min="0" step="5" value="1920"></input>
+        <p> X </p>
+        <input type="number" min="0" step="5" value="1080"></input>
+      </div>
+    </header>
+
+    <div class="action-panels"> <!--For lack of a better name. Code and canvas. What will be used frequently-->
+      <textarea placeholder="Code..."></textarea>
+
+      <div class="canvas-stuff">
+        <canvas id="shader-canvas"></canvas>
+        <div class="canvas-controls">
+          <button>Compile</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
