@@ -1,32 +1,13 @@
-<!DOCTYPE HTML>
-
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>Shaderer</title>
-    <link rel="stylesheet" href="style.css"></link>
-    <script src="script.js" defer></script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>shader-creator</title>
   </head>
   <body>
-    <header>
-      <div class="res-select">
-        <input type="number" min="0" step="5" value="100" id="res-select-x"></input>
-        <p> X </p>
-        <input type="number" min="0" step="5" value="100" id="res-select-y"></input>
-      </div>
-    </header>
-
-    <div class="action-panels"> <!--For lack of a better name. Code and canvas. What will be used frequently-->
-      <textarea placeholder="Code..." id="code-editor"></textarea>
-
-      <div class="canvas-stuff">
-          <div class="canvas-preview">
-              <canvas id="shader-canvas"></canvas>
-          </div>
-
-          <div class="canvas-controls">
-              <button id="compile-button">Compile</button>
-          </div>
-      </div>
-    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
