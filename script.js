@@ -1,6 +1,47 @@
 const canvas = document.getElementById('shader-canvas');
 const gl = canvas.getContext('webgl');
 
+const res_sel_x = document.getElementById("res-select-x");
+const res_sel_y = document.getElementById("res-select-y");
+
+function resizeCanvas() {
+    const res_x = Number(res_sel_x.value);
+    const res_y = Number(res_sel_y.value);
+
+    // Actual GPU resolution
+    canvas.width = res_x;
+    canvas.height = res_y;
+
+    // Preview area
+    const preview = document.querySelector(".canvas-preview");
+
+    const availableWidth = preview.clientWidth;
+    const availableHeight = preview.clientHeight;
+
+    const aspect = res_x / res_y;
+
+    let width;
+    let height;
+
+    if (availableWidth / availableHeight > aspect) {
+        // Preview area is relatively wider than the artwork
+        height = availableHeight;
+        width = height * aspect;
+    } else {
+        // Preview area is relatively taller than the artwork
+        width = availableWidth;
+        height = width / aspect;
+    }
+
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    recompileShaders();
+}
+
+res_sel_x.addEventListener('input', resizeCanvas);
+res_sel_y.addEventListener('input', resizeCanvas);
+
 const vsSource = `
 attribute vec2 a_position;
 void main() {
@@ -8,15 +49,16 @@ void main() {
 }
 `;
 
-const fsSource = `
-precision mediump float;
-uniform float u_time;
+const boilerplate = `precision highp float;
 uniform vec2 u_resolution;
+`;
 
-void main() {
-    vec2 st = gl_FragCoord.xy / u_resolution;
-    vec3 color = vec3(st.x, st.y, abs(sin(u_time)));
-    gl_FragColor = vec4(color, 1.0);
+let fsSource = `void main() {
+    vec2 uv = gl_FragCoord.xy / u_resolution;
+
+    vec3 col = 0.5 + 0.5*cos(uv.xyx+vec3(0,2,4));
+
+    gl_FragColor = vec4(col,1.0);
 }
 `;
 
@@ -24,36 +66,70 @@ function createShader(gl, type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+
+        console.error(log);
+
+        gl.deleteShader(shader);
+        return null;
+    }
     return shader;
 }
 
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
-const program = gl.createProgram();
-gl.attachShader(program, vertexShader);
-gl.attachShader(program, fragmentShader);
-gl.linkProgram(program);
-gl.useProgram(program);
+let currentProgram = null;
+let currentVertexShader = null;
+let currentFragmentShader = null;
+let positionBuffer = null;
+let resLocation = 0;
 
-const positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-    -1, -1,  1, -1, -1,  1,
-    -1,  1,  1, -1,  1,  1,
-]), gl.STATIC_DRAW);
+const editor = document.getElementById("code-editor");
 
-const aPositionLocation = gl.getAttribLocation(program, "a_position");
-gl.enableVertexAttribArray(aPositionLocation);
-gl.vertexAttribPointer(aPositionLocation, 2, gl.FLOAT, false, 0, 0);
+function recompileShaders() {
+    if (currentProgram) gl.deleteProgram(currentProgram);
+    if (currentVertexShader) gl.deleteShader(currentVertexShader);
+    if (currentFragmentShader) gl.deleteShader(currentFragmentShader);
+    if (positionBuffer) gl.deleteBuffer(positionBuffer);
 
-const timeLocation = gl.getUniformLocation(program, "u_time");
-const resLocation = gl.getUniformLocation(program, "u_resolution");
+    fsSource = editor.value;
+
+    currentVertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
+    currentFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, boilerplate + fsSource);
+    
+    currentProgram = gl.createProgram();
+    gl.attachShader(currentProgram, currentVertexShader);
+    gl.attachShader(currentProgram, currentFragmentShader);
+    gl.linkProgram(currentProgram);
+    gl.useProgram(currentProgram);
+
+    positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,  1, -1, -1,  1,
+        -1,  1,  1, -1,  1,  1,
+    ]), gl.STATIC_DRAW);
+
+    const aPositionLocation = gl.getAttribLocation(currentProgram, "a_position");
+    gl.enableVertexAttribArray(aPositionLocation);
+    gl.vertexAttribPointer(aPositionLocation, 2, gl.FLOAT, false, 0, 0);
+
+    resLocation = gl.getUniformLocation(currentProgram, "u_resolution");
+}
+
+editor.value = fsSource;
+
+resizeCanvas();
+
+document.getElementById("compile-button").addEventListener("click", recompileShaders);
+recompileShaders();
 
 function render(time) {
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.uniform2f(resLocation, canvas.width, canvas.height);
-    gl.uniform1f(timeLocation, time * 0.001);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
     requestAnimationFrame(render);
 }
+
 requestAnimationFrame(render);

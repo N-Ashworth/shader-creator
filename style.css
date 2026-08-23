@@ -20,21 +20,34 @@ textarea {
 
     background-color: #333344;
     color: #eeeeee;
+    resize: none;
 }
 
 .canvas-stuff {
     flex: 2;
+    min-width: 0;
+    min-height: 0;
+
+    gap: 20px;
 
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    height: 700px;
 }
 
-canvas {
-    height: 660px;
-    width: 100%;
-    background: blue;
+.canvas-preview {
+    flex: 1;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    justify-content: left;
+    align-items: left;
+    overflow: hidden;
+}
+
+#shader-canvas {
+    display: block;
 }
 
 .canvas-controls {

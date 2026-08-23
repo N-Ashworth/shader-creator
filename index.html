@@ -9,20 +9,23 @@
   <body>
     <header>
       <div class="res-select">
-        <input type="number" min="0" step="5" value="1920"></input>
+        <input type="number" min="0" step="5" value="100" id="res-select-x"></input>
         <p> X </p>
-        <input type="number" min="0" step="5" value="1080"></input>
+        <input type="number" min="0" step="5" value="100" id="res-select-y"></input>
       </div>
     </header>
 
     <div class="action-panels"> <!--For lack of a better name. Code and canvas. What will be used frequently-->
-      <textarea placeholder="Code..."></textarea>
+      <textarea placeholder="Code..." id="code-editor"></textarea>
 
       <div class="canvas-stuff">
-        <canvas id="shader-canvas"></canvas>
-        <div class="canvas-controls">
-          <button>Compile</button>
-        </div>
+          <div class="canvas-preview">
+              <canvas id="shader-canvas"></canvas>
+          </div>
+
+          <div class="canvas-controls">
+              <button id="compile-button">Compile</button>
+          </div>
       </div>
     </div>
   </body>
