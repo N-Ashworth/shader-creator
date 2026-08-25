@@ -154,7 +154,7 @@ function recompileShaders() {
   render();
 }
 
-view.dispatch({
+editor.dispatch({
   changes: {
     from: 0, 
     to: view.state.doc.length, 
