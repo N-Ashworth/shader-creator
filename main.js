@@ -119,7 +119,7 @@ function recompileShaders() {
   if (positionBuffer) gl.deleteBuffer(positionBuffer);
 
   // Read code straight from the plain HTML textarea
-  fsSource = myEditor.state.doc.toString();
+  fsSource = editor.state.doc.toString();
 
   currentVertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
   currentFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, boilerplate + fsSource);
