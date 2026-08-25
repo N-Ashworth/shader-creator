@@ -157,7 +157,7 @@ function recompileShaders() {
 editor.dispatch({
   changes: {
     from: 0, 
-    to: view.state.doc.length, 
+    to: editor.state.doc.length, 
     insert: fsSource
   }
 });
