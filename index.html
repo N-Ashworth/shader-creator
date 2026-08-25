@@ -2,12 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>shader-creator</title>
+    <title>Shader Creator</title>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+
+    <div class="action-panels">
+      <!-- The text area CodeMirror will replace -->
+      <textarea id="code-editor"></textarea>
+
+      <!-- The preview panel containing your WebGL canvas and controls -->
+      <div class="canvas-stuff">
+        <div class="canvas-controls">
+          <label for="res-select-x">Width:</label>
+          <input type="number" id="res-select-x" value="800" />
+          
+          <label for="res-select-y">Height:</label>
+          <input type="number" id="res-select-y" value="600" />
+
+          <button id="compile-button">Compile Shader</button>
+        </div>
+
+        <div class="canvas-preview">
+          <canvas id="shader-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- This links your script directly in the root folder -->
+    <script type="module" src="/main.js"></script>
   </body>
 </html>
