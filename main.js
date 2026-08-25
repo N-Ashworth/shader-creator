@@ -109,7 +109,7 @@ const editor = new EditorView({
   ],
 
   // 3. Pinpoint where to render the visual UI in your HTML
-  parent: document.getElementById('your-container-id') 
+  parent: document.getElementById('code-editor') 
 });
 
 function recompileShaders() {
