@@ -6,40 +6,58 @@ const res_sel_x = document.getElementById("res-select-x");
 const res_sel_y = document.getElementById("res-select-y");
 
 function resizeCanvas() {
-  const res_x = Number(res_sel_x.value);
-  const res_y = Number(res_sel_y.value);
+    const res_x = Number(res_sel_x.value);
+    const res_y = Number(res_sel_y.value);
 
-  // Actual GPU resolution
-  canvas.width = res_x;
-  canvas.height = res_y;
+    // Actual GPU resolution
+    canvas.width = res_x;
+    canvas.height = res_y;
 
-  // Preview area
-  const preview = document.querySelector(".canvas-preview");
-  const availableWidth = preview.clientWidth;
-  const availableHeight = preview.clientHeight;
-  const aspect = res_x / res_y;
+    // Preview area
+    const preview = document.querySelector(".canvas-preview");
+    const availableWidth = preview.clientWidth;
+    const availableHeight = preview.clientHeight;
+    const aspect = res_x / res_y;
 
-  let width;
-  let height;
+    let width;
+    let height;
 
-  if (availableWidth / availableHeight > aspect) {
-    // Preview area is relatively wider than the artwork
-    height = availableHeight;
-    width = height * aspect;
-  } else {
-    // Preview area is relatively taller than the artwork
-    width = availableWidth;
-    height = width / aspect;
-  }
+    if (availableWidth / availableHeight > aspect) {
+        // Preview area is relatively wider than the artwork
+        height = availableHeight;
+        width = height * aspect;
+    } else {
+        // Preview area is relatively taller than the artwork
+        width = availableWidth;
+        height = width / aspect;
+    }
 
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
 
-  recompileShaders();
+    recompileShaders();
 }
 
 res_sel_x.addEventListener('input', resizeCanvas);
 res_sel_y.addEventListener('input', resizeCanvas);
+
+function saveCanvas() {
+    const dataURL = canvas.toDataURL('image/png');
+
+    const link = document.createElement('a');
+
+    let name = document.getElementById('save-name').value;
+
+    if(name.length == 0) {
+        name = "shader-artwork"
+    }
+    link.download = name + '.png';
+    link.href = dataURL;
+
+    link.click();
+}
+
+document.getElementById('save-button').addEventListener('click', saveCanvas);
 
 const vsSource = `
   attribute vec2 a_position;
@@ -60,16 +78,16 @@ let fsSource = `void main() {
 `;
 
 function createShader(gl, type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const log = gl.getShaderInfoLog(shader);
-    console.error(log);
-    gl.deleteShader(shader);
-    return null;
-  }
-  return shader;
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        const log = gl.getShaderInfoLog(shader);
+        console.error(log);
+        gl.deleteShader(shader);
+        return null;
+    }
+    return shader;
 }
 
 let currentProgram = null;
