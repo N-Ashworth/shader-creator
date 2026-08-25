@@ -2,6 +2,8 @@ import { EditorView, basicSetup } from 'codemirror';
 import { glsl } from "codemirror-lang-glsl";
 import { tags as t } from "@lezer/highlight";
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { keymap } from "@codemirror/view";
+import { indentWithTab } from "@codemirror/commands";
 import './style.css';
 
 const canvas = document.getElementById('shader-canvas');
@@ -44,6 +46,15 @@ function resizeCanvas() {
 
 res_sel_x.addEventListener('input', resizeCanvas);
 res_sel_y.addEventListener('input', resizeCanvas);
+
+document.addEventListener('keydown', function(event) {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+        
+        event.preventDefault();
+        
+        recompileShaders();
+    }
+});
 
 function saveCanvas() {
     const dataURL = canvas.toDataURL('image/png');
@@ -115,7 +126,7 @@ const codeTheme = EditorView.theme({
   },
   // Highlight the active line your cursor is on
   ".cm-activeLine": {
-    backgroundColor: "#242631" 
+    backgroundColor: "rgba(36, 38, 49, 0.6)" 
   },
   // Style the vertical gutter where line numbers live
   ".cm-gutters": {
@@ -150,7 +161,8 @@ const editor = new EditorView({
     basicSetup,  // A massive bundle giving you line numbers, undo history, etc.
     glsl(), // The syntax parser that reads the code and applies colors
     codeTheme,
-    syntaxHighlighting(codeHighlightStyle)
+    syntaxHighlighting(codeHighlightStyle),
+    keymap.of([indentWithTab])
   ],
 
   // 3. Pinpoint where to render the visual UI in your HTML
