@@ -1,3 +1,5 @@
+import { EditorView, basicSetup } from 'codemirror';
+import { javascript } from '@codemirror/lang-javascript';
 import './style.css';
 
 const canvas = document.getElementById('shader-canvas');
@@ -96,8 +98,19 @@ let currentFragmentShader = null;
 let positionBuffer = null;
 let resLocation = 0;
 
+const editor = new EditorView({
+  // 1. Tell CodeMirror what initial text to hold
+  doc: "// Write your shader here...", 
 
-const editor = document.getElementById("code-editor");
+  // 2. Mix and match your feature plugins
+  extensions: [
+    basicSetup,  // A massive bundle giving you line numbers, undo history, etc.
+    javascript() // The syntax parser that reads the code and applies colors
+  ],
+
+  // 3. Pinpoint where to render the visual UI in your HTML
+  parent: document.getElementById('your-container-id') 
+});
 
 function recompileShaders() {
   if (currentProgram) gl.deleteProgram(currentProgram);
@@ -106,7 +119,7 @@ function recompileShaders() {
   if (positionBuffer) gl.deleteBuffer(positionBuffer);
 
   // Read code straight from the plain HTML textarea
-  fsSource = editor.value;
+  fsSource = myEditor.state.doc.toString();
 
   currentVertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
   currentFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, boilerplate + fsSource);
@@ -141,7 +154,14 @@ function recompileShaders() {
   render();
 }
 
-editor.value = fsSource;
+view.dispatch({
+  changes: {
+    from: 0, 
+    to: view.state.doc.length, 
+    insert: fsSource
+  }
+});
+
 resizeCanvas();
 
 document.getElementById("compile-button").addEventListener("click", recompileShaders);
