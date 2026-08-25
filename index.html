@@ -14,13 +14,20 @@
       <!-- The preview panel containing your WebGL canvas and controls -->
       <div class="canvas-stuff">
         <div class="canvas-controls">
-          <input type="number" id="res-select-x" value="800" />
-          <p>X</p>
-          <input type="number" id="res-select-y" value="600" />
-
           <button id="compile-button">Compile Shader</button>
+
+          <div class="control-box">
+            <input type="number" id="res-select-x" value="800" />
+            <p> X </p>
+            <input type="number" id="res-select-y" value="600" />
+          </div>
+
           <button id="save-button">Save Image</button>
-          <input type="text" placeholder="Image Name" id="save-name"></input>
+
+          <div class="control-box">
+            <input type="text" placeholder="Image Name" id="save-name"></input>
+            <p>.png</p>
+          </div>
         </div>
 
         <div class="canvas-preview">
