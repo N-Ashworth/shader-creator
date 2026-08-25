@@ -15,13 +15,21 @@ body {
     height: 700px;
 }
 
-textarea {
-    flex: 1;
-    border-radius: 0px;
+#code-editor {
+  flex: 1; 
+  border: 1px solid #333344;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-    background-color: #333344;
-    color: #eeeeee;
-    resize: none;
+#code-editor .cm-editor {
+  height: 100%;
+}
+
+#code-editor .cm-scroller {
+  overflow: auto;
 }
 
 .canvas-stuff {

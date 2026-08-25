@@ -1,5 +1,7 @@
 import { EditorView, basicSetup } from 'codemirror';
-import { javascript } from '@codemirror/lang-javascript';
+import { glsl } from "codemirror-lang-glsl";
+import { tags as t } from "@lezer/highlight";
+import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
 import './style.css';
 
 const canvas = document.getElementById('shader-canvas');
@@ -98,6 +100,47 @@ let currentFragmentShader = null;
 let positionBuffer = null;
 let resLocation = 0;
 
+const codeTheme = EditorView.theme({
+  // Style the main outer wrapper of CodeMirror
+  "&": {
+    backgroundColor: "#1e1e24", // Dark background matching your workspace
+    color: "#eeeeee",           // Main font color (light gray)
+    fontSize: "14px",
+    fontFamily: "Fira Code, Consolas, Monaco, monospace"
+  },
+  // Style the area where you actually type text
+  ".cm-content": {
+    caretColor: "#ffffff",     // White blinking cursor
+    padding: "10px 0"
+  },
+  // Highlight the active line your cursor is on
+  ".cm-activeLine": {
+    backgroundColor: "#242631" 
+  },
+  // Style the vertical gutter where line numbers live
+  ".cm-gutters": {
+    backgroundColor: "#1e1e24", // Match the main editor background
+    color: "#6c757d",           // Muted gray line numbers
+    border: "none"              // Remove the default ugly border separator
+  },
+  // Highlight the active line number in the gutter
+  ".cm-activeLineGutter": {
+    backgroundColor: "#282a36",
+    color: "#ffffff"
+  }
+}, { dark: true });
+
+const codeHighlightStyle = HighlightStyle.define([
+    { tag: t.keyword, color: "#ff79c6"},      // void, return
+    { tag: t.typeName, color: "#8be9fd" },                         // vec2, vec3, vec4, float
+    { tag: t.variableName, color: "#f8f8f2" },                     // uv, col
+    { tag: t.function(t.variableName), color: "#50fa7b" },         // cos, vec3() constructor
+    { tag: t.number, color: "#bd93f9" },                           // 0.5, 1.0, 0, 2, 4
+    { tag: t.operator, color: "#ff79c6" },                         // =, +, /, *
+    { tag: t.comment, color: "#6272a4", fontStyle: "italic" },     // // comments
+    { tag: t.punctuation, color: "#f8f8f2" }                       // ;, (), {}, []
+]);
+
 const editor = new EditorView({
   // 1. Tell CodeMirror what initial text to hold
   doc: "// Write your shader here...", 
@@ -105,7 +148,9 @@ const editor = new EditorView({
   // 2. Mix and match your feature plugins
   extensions: [
     basicSetup,  // A massive bundle giving you line numbers, undo history, etc.
-    javascript() // The syntax parser that reads the code and applies colors
+    glsl(), // The syntax parser that reads the code and applies colors
+    codeTheme,
+    syntaxHighlighting(codeHighlightStyle)
   ],
 
   // 3. Pinpoint where to render the visual UI in your HTML
