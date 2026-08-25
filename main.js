@@ -170,6 +170,7 @@ const editor = new EditorView({
 });
 
 function recompileShaders() {
+  document.getElementById("compile-button").style.background = "#ffff00";
   if (currentProgram) gl.deleteProgram(currentProgram);
   if (currentVertexShader) gl.deleteShader(currentVertexShader);
   if (currentFragmentShader) gl.deleteShader(currentFragmentShader);
@@ -209,6 +210,7 @@ function recompileShaders() {
   resLocation = gl.getUniformLocation(currentProgram, "u_resolution");
 
   render();
+  document.getElementById("compile-button").style.background = "#ffffff";
 }
 
 editor.dispatch({
