@@ -11,6 +11,67 @@ const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true });
 const res_sel_x = document.getElementById("res-select-x");
 const res_sel_y = document.getElementById("res-select-y");
 
+let fsSource = `void main() { 
+  vec2 uv = gl_FragCoord.xy / u_resolution; 
+  vec3 col = 0.5 + 0.5*cos(uv.xyx+vec3(0,2,4)); 
+  gl_FragColor = vec4(col,1.0); 
+}`;
+
+let textures = {
+  "Main": {
+    code: fsSource,
+    type: "render"
+  }
+};
+
+let editedTexture = "Main";
+
+function syncCode(newTexture) {
+  textures[editedTexture].code = editor.state.doc.toString();
+  editor.dispatch({
+    changes: {
+      from: 0, 
+      to: editor.state.doc.length, 
+      insert: textures[newTexture].code
+    }
+  });
+  editedTexture = newTexture;
+}
+
+function updateTextureList() {
+  const textureList = document.getElementById("texture-list");
+  textureList.replaceChildren();
+
+  for (const name of Object.keys(textures)) {
+    const textureSlot = document.createElement('div');
+    textureSlot.classList.add("texture");
+
+    const texLabel = document.createElement('p');
+    texLabel.textContent = name;
+    textureSlot.appendChild(texLabel);
+    textureList.appendChild(textureSlot);
+
+    textureSlot.addEventListener('click', () => syncCode(name));
+  }
+
+  document.getElementById('tex-count').textContent = `${Object.keys(textures).length}/16 textures`
+}
+
+function addTexture() {
+  const title = document.getElementById('add-tex-title').value;
+
+  if(title in textures) {
+    return;
+  }
+
+  textures[title] = {
+    "code": "",
+    "type": "render"
+  }
+
+  updateTextureList();
+}
+
 function resizeCanvas() {
     const res_x = Number(res_sel_x.value);
     const res_y = Number(res_sel_y.value);
@@ -83,13 +144,6 @@ const vsSource = `
 
 const boilerplate = `precision highp float;
 uniform vec2 u_resolution;
-`;
-
-let fsSource = `void main() {
-  vec2 uv = gl_FragCoord.xy / u_resolution;
-  vec3 col = 0.5 + 0.5*cos(uv.xyx+vec3(0,2,4));
-  gl_FragColor = vec4(col,1.0);
-}
 `;
 
 function createShader(gl, type, source) {
@@ -168,13 +222,13 @@ const editor = new EditorView({
 
 function recompileShaders() {
   document.getElementById("compile-button").style.background = "#ffff00";
+  document.getElementById("compile-button").textContent = "Compiling...";
   if (currentProgram) gl.deleteProgram(currentProgram);
   if (currentVertexShader) gl.deleteShader(currentVertexShader);
   if (currentFragmentShader) gl.deleteShader(currentFragmentShader);
   if (positionBuffer) gl.deleteBuffer(positionBuffer);
 
-  // Read code straight from the plain HTML textarea
-  fsSource = editor.state.doc.toString();
+  fsSource = textures.Main.code;
 
   currentVertexShader = createShader(gl, gl.VERTEX_SHADER, vsSource);
   currentFragmentShader = createShader(gl, gl.FRAGMENT_SHADER, boilerplate + fsSource);
@@ -208,61 +262,7 @@ function recompileShaders() {
 
   render();
   document.getElementById("compile-button").style.background = "#ffffff";
-}
-
-let textures = {
-  "Main": {
-    "code": "",
-    "type": "render"
-  }
-};
-
-let editedTexture = "Main";
-
-function syncCode(newTexture) {
-  textures[editedTexture].code = editor.state.doc.toString();
-  editor.dispatch({
-    changes: {
-      from: 0, 
-      to: editor.state.doc.length, 
-      insert: textures[newTexture].code
-    }
-  });
-  editedTexture = newTexture;
-}
-
-function updateTextureList() {
-  const textureList = document.getElementById("texture-list");
-  textureList.replaceChildren();
-
-  for (const name of Object.keys(textures)) {
-    const textureSlot = document.createElement('div');
-    textureSlot.classList.add("texture");
-
-    const texLabel = document.createElement('p');
-    texLabel.textContent = name;
-    textureSlot.appendChild(texLabel);
-    textureList.appendChild(textureSlot);
-
-    textureSlot.addEventListener('click', () => syncCode(name));
-  }
-
-  document.getElementById('tex-count').textContent = `${Object.keys(textures).length}/16 textures`
-}
-
-function addTexture() {
-  const title = document.getElementById('add-tex-title').value;
-
-  if(title in textures) {
-    return;
-  }
-
-  textures[title] = {
-    "code": "",
-    "type": "render"
-  }
-
-  updateTextureList();
+  document.getElementById("compile-button").textContent = "Compile Shader";
 }
 
 editor.dispatch({
