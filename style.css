@@ -4,6 +4,43 @@ body {
     color: white;
 }
 
+#texture-select {
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+}
+
+#texture-list { 
+    width: 200px; 
+    background-color: #1e1e24; 
+    border: 1px solid #333344; 
+    border-radius: 6px; 
+    overflow: hidden; 
+    height: fit-content;
+    box-sizing: border-box;
+} 
+
+.texture {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    
+    padding: 0 15px;
+    height: 40px; 
+    box-sizing: border-box;
+
+    border-bottom: 2px dashed #333344; 
+} 
+
+.texture p { 
+    margin: 0;
+} 
+
+.texture:hover { 
+    background-color: #333344; 
+    cursor: pointer;
+}
+
 .res-select {
     display: flex;
 }

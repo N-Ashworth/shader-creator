@@ -153,19 +153,16 @@ const codeHighlightStyle = HighlightStyle.define([
 ]);
 
 const editor = new EditorView({
-  // 1. Tell CodeMirror what initial text to hold
   doc: "// Write your shader here...", 
 
-  // 2. Mix and match your feature plugins
   extensions: [
-    basicSetup,  // A massive bundle giving you line numbers, undo history, etc.
-    glsl(), // The syntax parser that reads the code and applies colors
+    basicSetup,
+    glsl(),
     codeTheme,
     syntaxHighlighting(codeHighlightStyle),
     keymap.of([indentWithTab])
   ],
 
-  // 3. Pinpoint where to render the visual UI in your HTML
   parent: document.getElementById('code-editor') 
 });
 
@@ -213,6 +210,58 @@ function recompileShaders() {
   document.getElementById("compile-button").style.background = "#ffffff";
 }
 
+let textures = {
+  "Main": {
+    "code": "",
+    "type": "render"
+  }
+};
+
+let editedTexture = "Main";
+
+function syncCode(newTexture) {
+  textures[editedTexture].code = editor.state.doc.toString();
+  editor.dispatch({
+    changes: {
+      from: 0, 
+      to: editor.state.doc.length, 
+      insert: textures[newTexture].code
+    }
+  });
+}
+
+function updateTextureList() {
+  const textureList = document.getElementById("texture-list");
+  textureList.replaceChildren();
+
+  for (const name of Object.keys(textures)) {
+    const textureSlot = document.createElement('div');
+    textureSlot.classList.add("texture");
+
+    const texLabel = document.createElement('p');
+    texLabel.textContent = name;
+    textureSlot.appendChild(texLabel);
+    textureList.appendChild(textureSlot);
+  }
+
+  document.getElementById('tex-count').textContent = `${Object.keys(textures).length}/16 textures`
+}
+
+function addTexture() {
+  const title = document.getElementById('add-tex-title').value;
+
+  if(title in textures) {
+    return;
+  }
+
+  textures[title] = {
+    "code": "",
+    "type": "render"
+  }
+
+  updateTextureList();
+}
+
 editor.dispatch({
   changes: {
     from: 0, 
@@ -224,7 +273,10 @@ editor.dispatch({
 resizeCanvas();
 
 document.getElementById("compile-button").addEventListener("click", recompileShaders);
+document.getElementById("add-tex-button").addEventListener("click", addTexture);
 recompileShaders();
+
+updateTextureList();
 
 function render(time) {
   gl.viewport(0, 0, canvas.width, canvas.height);

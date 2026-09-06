@@ -6,12 +6,18 @@
     <title>Shader Creator</title>
   </head>
   <body>
-
     <div class="action-panels">
-      <!-- The text area CodeMirror will replace -->
+      <div id="texture-select">
+        <p id="tex-count">1/16 textures</p>
+        <div id="texture-list">
+
+        </div>
+        <button id="add-tex-button">Add Texture</button>
+        <input type="text" placeholder="Texture Title:" id="add-tex-title"></input>
+      </div>
+
       <div id="code-editor"></div>
 
-      <!-- The preview panel containing your WebGL canvas and controls -->
       <div class="canvas-stuff">
         <div class="canvas-controls">
           <button id="compile-button">Compile Shader</button>
