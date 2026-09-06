@@ -228,6 +228,7 @@ function syncCode(newTexture) {
       insert: textures[newTexture].code
     }
   });
+  editedTexture = newTexture;
 }
 
 function updateTextureList() {
@@ -242,6 +243,8 @@ function updateTextureList() {
     texLabel.textContent = name;
     textureSlot.appendChild(texLabel);
     textureList.appendChild(textureSlot);
+
+    textureSlot.addEventListener('click', () => syncCode(name));
   }
 
   document.getElementById('tex-count').textContent = `${Object.keys(textures).length}/16 textures`
